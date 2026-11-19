@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-night-950 text-night-100 font-body antialiased;
+}
+
+.section-shell {
+  @apply mx-auto w-full max-w-6xl px-6 py-20 sm:py-24;
+}
+
+.section-tag {
+  @apply inline-flex items-center gap-2 rounded-full border border-electric-700/40 bg-electric-950/40 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-electric-300;
+}
+
+.card {
+  @apply rounded-2xl border border-night-800 bg-night-900/70 shadow-lg shadow-black/20 backdrop-blur;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full bg-electric-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-electric-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-electric-400;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-full border border-night-700 px-6 py-3 text-sm font-semibold text-night-200 transition hover:border-electric-600 hover:text-electric-300;
+}
+
+::selection {
+  @apply bg-electric-700/60 text-white;
+}

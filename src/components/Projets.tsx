@@ -9,28 +9,28 @@ import { RapportLink } from '@/components/MediaSlots';
 
 function CarteProjet({ projet }: { projet: Projet }) {
   return (
-    <article className="card flex flex-col p-6 transition-all duration-300 hover:-translate-y-1 hover:border-electric-700/60">
-      <div className="flex flex-wrap items-center gap-3 text-xs text-night-400">
-        <span className="rounded-full bg-electric-600/15 px-3 py-1 font-medium text-electric-300">
+    <article className="card-light flex flex-col p-6 transition-all duration-300 hover:-translate-y-1 hover:border-electric-400">
+      <div className="flex flex-wrap items-center gap-3 text-xs text-night-600">
+        <span className="rounded-full bg-electric-100 px-3 py-1 font-medium text-electric-700">
           {projet.contexte}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Calendar size={13} aria-hidden="true" />
           {projet.periode}
         </span>
-        <span className="ml-auto rounded-full border border-night-700 px-3 py-1 text-night-300">
+        <span className="ml-auto rounded-full border border-night-300 px-3 py-1 text-night-600">
           {projet.statut}
         </span>
       </div>
 
-      <h3 className="mt-4 font-display text-xl font-semibold text-white">{projet.titre}</h3>
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-night-300">{projet.resume}</p>
+      <h3 className="mt-4 font-display text-xl font-semibold text-night-900">{projet.titre}</h3>
+      <p className="mt-2 flex-1 text-sm leading-relaxed text-night-700">{projet.resume}</p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {projet.technologies.map((t) => (
           <span
             key={t}
-            className="inline-flex items-center gap-1.5 rounded-full border border-night-700 px-3 py-1 text-xs text-night-300"
+            className="inline-flex items-center gap-1.5 rounded-full border border-night-300 px-3 py-1 text-xs text-night-600"
           >
             <Wrench size={11} aria-hidden="true" />
             {t}

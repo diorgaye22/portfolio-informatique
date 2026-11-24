@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   ArrowLeft, ArrowRight, Terminal, Server, MonitorSmartphone, Network,
   Search, Key, Mail, Bug, ShieldAlert, ShieldCheck,
-  CheckCircle2, Download, ChevronDown, Lock, Eye, FileText, Target,
+  CheckCircle2, Download, ChevronDown, Lock, Eye, Target,
   ListChecks, Calendar, GraduationCap,
 } from 'lucide-react';
 import type { FicheProjet } from '@/types';
@@ -262,7 +262,6 @@ export default function ProjetCybersecurite({ projet, onRetour }: Props) {
 
   return (
     <div className="min-h-screen pt-24 md:pt-28">
-      {/* HERO */}
       <header className="border-b border-night-800 bg-gradient-to-b from-electric-950/40 to-transparent">
         <div className="mx-auto max-w-5xl px-5 pb-14 pt-4">
           <button type="button" onClick={onRetour} className="mb-8 inline-flex items-center gap-2 text-sm text-night-400 hover:text-electric-300">
@@ -301,12 +300,10 @@ export default function ProjetCybersecurite({ projet, onRetour }: Props) {
         </div>
       </header>
 
-      {/* CONTEXTE */}
       <Section icon={Target} title="Contexte et problématique">
         <p className="leading-relaxed text-night-300">{projet.problematique}</p>
       </Section>
 
-      {/* OBJECTIFS */}
       <Section icon={ListChecks} title="Objectifs du travail pratique">
         <ul className="grid gap-3 md:grid-cols-2">
           {projet.objectifs.map((o, i) => (
@@ -318,7 +315,6 @@ export default function ProjetCybersecurite({ projet, onRetour }: Props) {
         </ul>
       </Section>
 
-      {/* ENVIRONNEMENT + MACHINES */}
       <Section icon={Server} title="Environnement technique et machines du laboratoire">
         <ul className="mb-8 space-y-2">
           {projet.environnement.map((e, i) => (
@@ -339,3 +335,118 @@ export default function ProjetCybersecurite({ projet, onRetour }: Props) {
               <p className="mt-3 text-xs leading-relaxed text-night-400">{m.detail}</p>
             </div>
           ))}
+        </div>
+      </Section>
+
+      {projet.schema && (
+        <Section icon={Network} title="Architecture du laboratoire">
+          <p className="mb-6 leading-relaxed text-night-300">{projet.schemaLegende}</p>
+          <div className="grid gap-6 md:grid-cols-2">
+            <figure className="m-0 min-w-0">
+              <div className="overflow-hidden rounded-xl border border-night-800">
+                <img src={projet.schema} alt="Schéma de la topologie du laboratoire" loading="lazy" className="w-full" />
+              </div>
+              <figcaption className="mt-2 break-words text-xs text-night-500">Schéma réalisé pour ce portfolio, à partir de la description du rapport.</figcaption>
+            </figure>
+            <figure className="m-0 min-w-0">
+              <div className="overflow-hidden rounded-xl border border-night-800">
+                <img src="/img/sec-topology.jpg" alt="Capture de la topologie configurée sous GNS3" loading="lazy" className="w-full" />
+              </div>
+              <figcaption className="mt-2 break-words text-xs text-night-500">Capture authentique de la topologie réellement configurée sous GNS3 (rapport original).</figcaption>
+            </figure>
+          </div>
+        </Section>
+      )}
+
+      <section id="methodologie" className="border-t border-night-800 py-14 md:py-20">
+        <div className="mx-auto max-w-5xl px-5">
+          <div className="mb-8 flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-electric-500/10 text-electric-400"><Terminal size={20} aria-hidden="true" /></span>
+            <h2 className="text-2xl font-bold text-white md:text-3xl">Manipulations réalisées</h2>
+          </div>
+
+          <div className="mb-8 flex flex-wrap gap-2 border-b border-night-800 pb-4">
+            {TOOLS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${tab === t.id ? 'bg-electric-500 text-white' : 'bg-night-900 text-night-400 hover:text-night-100'}`}
+              >
+                <t.icon size={15} aria-hidden="true" /> {t.label}
+              </button>
+            ))}
+          </div>
+
+          <p className="mb-6 max-w-2xl leading-relaxed text-night-300">{active.resume}</p>
+
+          <div className="space-y-4">
+            {active.manips.map((m, i) => <ManipCard key={i} m={m} n={i + 1} />)}
+          </div>
+        </div>
+      </section>
+
+      <Section icon={Eye} title="Résultats et observations">
+        <ul className="space-y-3">
+          {projet.resultats.map((r, i) => (
+            <li key={i} className="flex items-start gap-2.5 rounded-lg border border-night-800 bg-night-900/30 p-4 text-sm text-night-300">
+              <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-400" aria-hidden="true" /> {r}
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      {projet.vulnerabilites && (
+        <Section icon={ShieldCheck} title="Vulnérabilités identifiées et recommandations de sécurité">
+          <div className="overflow-x-auto rounded-xl border border-night-800">
+            <table className="w-full min-w-[520px] border-collapse text-left text-sm">
+              <thead>
+                <tr className="bg-night-900 text-xs uppercase tracking-wide text-night-400">
+                  <th className="px-4 py-3 font-semibold">Vulnérabilité exploitée</th>
+                  <th className="px-4 py-3 font-semibold">Mesure de protection</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-night-800">
+                {projet.vulnerabilites.map((v, i) => (
+                  <tr key={i} className="align-top odd:bg-night-900/20">
+                    <td className="break-words px-4 py-3 text-night-200">{v.vulnerabilite}</td>
+                    <td className="break-words px-4 py-3 text-night-300">{v.mesure}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Section>
+      )}
+
+      <Section icon={GraduationCap} title="Compétences techniques mobilisées">
+        <div className="flex flex-wrap gap-2.5">
+          {projet.competences.map((c, i) => (
+            <span key={i} className="rounded-lg border border-night-800 bg-night-900/40 px-4 py-2.5 text-sm text-night-200">{c}</span>
+          ))}
+        </div>
+      </Section>
+
+      <Section icon={Lock} title="Conclusion">
+        <div className="rounded-xl border border-night-800 bg-night-900/30 p-6">
+          <p className="leading-relaxed text-night-300">
+            Ce travail a montré qu'une compromission réussit rarement grâce à une seule faille : elle enchaîne des faiblesses
+            techniques (services obsolètes, mots de passe faibles) et humaines (ingénierie sociale). Connaître ces techniques
+            est indispensable pour bien défendre un système — c'est le principe même de l'ethical hacking qui fonde cette démarche.
+          </p>
+          {projet.rapport && (
+            <a href={projet.rapport} download className="btn-primary mt-6 inline-flex">
+              <Download size={16} aria-hidden="true" /> Télécharger le dossier technique complet (PDF)
+            </a>
+          )}
+        </div>
+      </Section>
+
+      <div className="border-t border-night-800 py-10 text-center">
+        <button type="button" onClick={onRetour} className="inline-flex items-center gap-2 text-sm text-night-400 hover:text-electric-300">
+          <ArrowLeft size={16} aria-hidden="true" /> Retour à tous les projets
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -183,7 +183,7 @@ export const projets: FicheProjet[] = [
     ],
     schema: '/securite-schema.svg',
     schemaLegende:
-      "Quatre machines virtuelles sur le même réseau isolé : Kali Linux (attaquant) face à Metasploitable, Ubuntu et Windows (cibles). Une partie du TP a été rejouée sur une topologie segmentée avec des routeurs (GNS3) pour simuler une attaque externe.",
+      "Quatre machines virtuelles sur le même réseau isolé 192.168.1.0/24 : Kali Linux (attaquant) face à Metasploitable, Ubuntu et Windows (cibles). Une partie du TP a ensuite été rejouée sur une topologie segmentée par deux routeurs (GNS3), avec un plan d'adressage distinct en 172.16.0.0/16 : les routeurs assurent le routage entre le segment de l'attaquant et celui des cibles. Dans cette simulation externe, l'attaquant écoute depuis l'adresse 172.16.0.1 (LHOST) et atteint Metasploitable via l'adresse 192.168.1.1 côté routeur.",
     etapes: [
       "Mise en place de 4 machines virtuelles et adressage IP statique de chacune (ifconfig / ip a / ipconfig selon le système)",
       "Vérification de la connectivité entre toutes les machines avec ping",

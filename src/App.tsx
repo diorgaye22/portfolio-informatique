@@ -13,6 +13,10 @@ const lireSlug = (): string | null => {
   return m ? decodeURIComponent(m[1]) : null;
 };
 
+// Ancres internes à une page de projet : un changement vers l'une de ces ancres
+// doit seulement faire défiler la page en cours, pas renvoyer à l'accueil.
+const ANCRES_INTERNES_PROJET = ['methodologie'];
+
 const retourAuxProjets = () => {
   window.location.hash = 'projets';
 };
@@ -21,7 +25,16 @@ export default function App() {
   const [slug, setSlug] = useState<string | null>(lireSlug);
 
   useEffect(() => {
-    const onHash = () => setSlug(lireSlug());
+    const onHash = () => {
+      const nouveauSlug = lireSlug();
+      if (nouveauSlug) {
+        setSlug(nouveauSlug);
+        return;
+      }
+      const ancre = window.location.hash.slice(1);
+      if (ANCRES_INTERNES_PROJET.includes(ancre)) return; // on reste sur la page de projet actuelle
+      setSlug(null);
+    };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);

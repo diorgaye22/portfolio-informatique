@@ -177,9 +177,11 @@ export default function PageProjet({ projet, onRetour }: Props) {
           </SectionFiche>
         )}
 
-        <SectionFiche icone={BadgeCheck} titre="Captures d'écran des manipulations">
-          <Galerie galerie={projet.galerie} titre={projet.titre} />
-        </SectionFiche>
+                {projet.galerie && projet.galerie.length > 0 && (
+          <SectionFiche icone={BadgeCheck} titre="Captures d'écran des manipulations">
+            <Galerie galerie={projet.galerie} titre={projet.titre} />
+          </SectionFiche>
+        )}
 
         <SectionFiche icone={CheckCircle2} titre="Résultats réellement obtenus">
           <ListePuces items={projet.resultats} />

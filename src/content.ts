@@ -290,7 +290,110 @@ export const projets: FicheProjet[] = [
     technologies: ['Nmap', 'Hydra', 'Metasploit', 'Social-Engineer Toolkit', 'Kali Linux', 'GNS3'],
     rapport: '/dossier-securite-expurge.pdf',
   },
-  {
+  {  {
+    slug: 'firewall-reseau-securise',
+    titre: "Architecture réseau sécurisée : Firewall Linux, Port Forwarding et attaque SYN Flooding",
+    contexte: 'Projet de réseaux — EC Routage & Commutation (Licence 3 SRT)',
+    periode: '2025 – 2026',
+    statut: 'Travail de groupe · matériel physique · fiche complète',
+    resume:
+      "Mise en place d'une architecture réseau sécurisée sur matériel physique : déploiement de services (Web, messagerie, DNS, TFTP), configuration d'un Firewall Linux avec IPTABLES, activation du Port Forwarding, puis démonstration d'une attaque par déni de service (SYN Flooding) et mise en place d'une protection.",
+    problematique:
+      "Comment séparer un réseau privé d'un réseau public à l'aide d'un Firewall Linux, permettre malgré tout l'accès à un service interne depuis l'extérieur (Port Forwarding), puis démontrer la vulnérabilité de ce service face à une attaque par saturation (SYN Flooding), avant d'y apporter une protection ?",
+    cadreEthique:
+      "Projet réalisé en groupe (groupe 2), sur du matériel physique en salle du département TIC, et évalué en direct par l'enseignant (Dr Diery Ngom). Ce TP n'a pas donné lieu à des captures d'écran : cette fiche s'appuie sur le sujet officiel du projet et sur le compte-rendu des manipulations fourni par l'étudiante.",
+    objectifs: [
+      "Déployer dans le réseau privé (LAN) des services réseau réels sous Linux : Web, messagerie, DNS et partage de fichiers (TFTP)",
+      "Mettre en œuvre un routeur pare-feu Linux séparant le réseau privé du réseau public, à l'aide d'IPTABLES",
+      "Configurer le NAT (MASQUERADE) pour permettre aux machines du réseau privé de communiquer vers l'extérieur",
+      "Activer le Port Forwarding pour rendre accessible depuis le réseau public un service hébergé dans le réseau privé",
+      "Lancer une attaque par saturation de type SYN Flooding (hping3) contre le serveur Web, et en constater l'effet",
+      "Mettre en place une règle de limitation du trafic pour contourner cette attaque",
+    ],
+    environnement: [
+      'Groupe 2 : réseau privé 192.168.2.0/24, passerelle 192.168.2.254',
+      'Réseau public (simulant Internet) : 172.16.0.0/16, passerelle 172.16.0.1',
+      'Machine Firewall Linux à deux interfaces (eth1 interne, eth0 externe), IPTABLES',
+      'Serveur Web Apache déployé dans le réseau privé ; services SSH et Telnet installés sur le Firewall et une machine interne',
+      "Outil hping3 pour la simulation de l'attaque SYN Flooding",
+      'Matériel physique du département TIC (pas de machines virtuelles pour ce projet)',
+    ],
+    schema: '/reseau-firewall-schema.svg',
+    schemaLegende:
+      "Schéma simplifié de l'architecture mise en place par le groupe 2 : un réseau privé (192.168.2.0/24) séparé d'un réseau public (172.16.0.0/16) par un Firewall Linux, avec un service Web rendu accessible depuis l'extérieur par Port Forwarding — et la cible de l'attaque SYN Flooding menée depuis le réseau public.",
+    etapes: [
+      "Configuration de l'adressage IP et de la table de routage de la machine cliente (passerelle 192.168.2.254)",
+      "Configuration des deux interfaces réseau de la machine Firewall et activation du routage (ip_forward)",
+      "Mise en place d'une machine dans le réseau public (172.16.0.0/16) et premiers tests de connectivité",
+      "Activation du NAT (MASQUERADE) sur le Firewall pour permettre aux machines privées de joindre le réseau public",
+      "Écriture des règles IPTABLES : politiques par défaut en rejet (DROP), puis autorisations explicites (web, DNS, SSH, Telnet, retour des connexions établies)",
+      "Déploiement des services réels dans le réseau privé : serveur Web Apache, messagerie, DNS, TFTP",
+      "Activation du Port Forwarding (règle DNAT) pour rediriger les requêtes HTTP du réseau public vers le serveur Web interne",
+      "Tests d'accès aux services depuis le réseau public pour valider le fonctionnement du Port Forwarding",
+      "Lancement d'une attaque SYN Flooding avec hping3 depuis le réseau public contre le service Web exposé",
+      "Constat de l'indisponibilité du serveur Web pendant l'attaque, puis mise en place d'une règle de limitation du trafic SYN",
+      "Nouveau test d'accès au service Web pour vérifier l'efficacité de la protection",
+    ],
+    commandes: [
+      {
+        titre: 'Activation du routage et du NAT sur le Firewall',
+        commandes: [
+          { commande: 'echo 1 > /proc/sys/net/ipv4/ip_forward', explication: "Activer le routage sur la machine Firewall, indispensable pour qu'elle puisse faire transiter le trafic entre les deux réseaux" },
+          { commande: 'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE', explication: "Activer le NAT : masquer les adresses du réseau privé derrière l'adresse publique du Firewall" },
+        ],
+      },
+      {
+        titre: 'Politique de filtrage par défaut (IPTABLES)',
+        commandes: [
+          { commande: 'iptables -P INPUT DROP ; iptables -P FORWARD DROP ; iptables -P OUTPUT DROP', explication: "Tout interdire par défaut, puis autoriser explicitement uniquement les flux nécessaires (règle de base en sécurité)" },
+          { commande: 'iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT', explication: "Autoriser le retour des connexions déjà établies depuis le réseau privé" },
+        ],
+      },
+      {
+        titre: 'Activation du Port Forwarding',
+        commandes: [
+          { commande: 'iptables -t nat -A PREROUTING -p tcp -i eth0 -d <IP_firewall> --dport 80 -j DNAT --to 192.168.2.Y', explication: "Rediriger les requêtes HTTP arrivant sur le Firewall depuis le réseau public vers le serveur Web du réseau privé" },
+        ],
+      },
+      {
+        titre: "Attaque SYN Flooding et protection",
+        commandes: [
+          { commande: 'hping3 -i u10 -S -p 80 -a 172.16.0.X 172.16.0.Y', explication: "Simuler, depuis le réseau public, une attaque par saturation de type SYN Flooding contre le service Web exposé" },
+          { commande: 'iptables -A INPUT -p tcp --syn -m limit --limit 1/second --limit-burst 3 -j ACCEPT', explication: "Limiter le débit des nouvelles connexions TCP pour contenir l'attaque" },
+          { commande: 'iptables -A INPUT -p tcp --syn -j DROP', explication: "Rejeter les connexions SYN excédentaires, au-delà de la limite autorisée" },
+        ],
+      },
+    ],
+    galerie: [],
+    resultats: [
+      "Les quatre services demandés (Web, messagerie, DNS, TFTP) ont été déployés dans le réseau privé",
+      "Après correction d'un oubli d'activation du routage, la connectivité entre le réseau privé et le réseau public a fonctionné normalement",
+      "Le Port Forwarding a fonctionné après une première phase de mise au point : le serveur Web interne est devenu accessible depuis le réseau public",
+      "L'attaque SYN Flooding lancée avec hping3 a rendu le serveur Web inaccessible, démontrant concrètement la vulnérabilité d'un service exposé sans protection",
+      "Après application des règles de limitation du trafic SYN, le test a été rejoué avec hping3 pour vérifier que le service restait accessible",
+    ],
+    difficultes: [
+      {
+        difficulte: "Au début de la manipulation, les ping entre le réseau privé et le réseau public ne fonctionnaient pas.",
+        solution: "Le routage (ip_forward) n'avait pas été activé sur la machine Firewall ; son activation a résolu le problème de connectivité.",
+      },
+      {
+        difficulte: "La configuration initiale du Port Forwarding ne permettait pas encore d'accéder au serveur Web depuis le réseau public.",
+        solution: "Après vérification et correction de la règle de redirection (DNAT), l'accès au service a fonctionné.",
+      },
+    ],
+    competences: [
+      'Configuration et routage réseau sous Linux (interfaces, ip_forward)',
+      'Filtrage de paquets avec IPTABLES (chaînes INPUT, OUTPUT, FORWARD)',
+      "Translation d'adresses (NAT / MASQUERADE) et Port Forwarding (DNAT)",
+      'Déploiement de services réseau réels (Web, DNS, messagerie, TFTP) sous Linux',
+      "Compréhension et démonstration d'une attaque par déni de service (SYN Flooding)",
+      'Mise en place de règles de limitation de trafic pour contrer une attaque réseau',
+      'Travail en équipe sur une infrastructure réseau physique, évalué en conditions réelles',
+    ],
+    technologies: ['Linux', 'IPTABLES', 'NAT', 'hping3', 'Apache', 'DNS', 'TFTP'],
+    rapport: '',
+  },
     slug: 'dns-bind9-linux',
     masque: true,
     titre: 'Installation et configuration de DNS avec BIND9 sous Linux',

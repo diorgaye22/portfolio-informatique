@@ -290,7 +290,7 @@ export const projets: FicheProjet[] = [
     technologies: ['Nmap', 'Hydra', 'Metasploit', 'Social-Engineer Toolkit', 'Kali Linux', 'GNS3'],
     rapport: '/dossier-securite-expurge.pdf',
   },
-  {  {
+  {
     slug: 'firewall-reseau-securise',
     titre: "Architecture réseau sécurisée : Firewall Linux, Port Forwarding et attaque SYN Flooding",
     contexte: 'Projet de réseaux — EC Routage & Commutation (Licence 3 SRT)',
@@ -385,7 +385,7 @@ export const projets: FicheProjet[] = [
     competences: [
       'Configuration et routage réseau sous Linux (interfaces, ip_forward)',
       'Filtrage de paquets avec IPTABLES (chaînes INPUT, OUTPUT, FORWARD)',
-      "Translation d'adresses (NAT / MASQUERADE) et Port Forwarding (DNAT)",
+      'Translation d\'adresses (NAT / MASQUERADE) et Port Forwarding (DNAT)',
       'Déploiement de services réseau réels (Web, DNS, messagerie, TFTP) sous Linux',
       "Compréhension et démonstration d'une attaque par déni de service (SYN Flooding)",
       'Mise en place de règles de limitation de trafic pour contrer une attaque réseau',
@@ -394,6 +394,7 @@ export const projets: FicheProjet[] = [
     technologies: ['Linux', 'IPTABLES', 'NAT', 'hping3', 'Apache', 'DNS', 'TFTP'],
     rapport: '',
   },
+  {
     slug: 'dns-bind9-linux',
     masque: true,
     titre: 'Installation et configuration de DNS avec BIND9 sous Linux',

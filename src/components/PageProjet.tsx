@@ -136,7 +136,7 @@ export default function PageProjet({ projet, onRetour }: Props) {
         </SectionFiche>
 
         <SectionFiche icone={Network} titre="Architecture ou schéma technique">
-          <MediaFigure chemin={projet.schema} alt={`Schéma technique — ${projet.titre}`} />
+          <MediaFigure chemin={projet.schema} alt={`Schéma technique — ${projet.titre}`} contenirEntier />
           <p className="mt-3 text-xs leading-relaxed text-night-400">{projet.schemaLegende}</p>
         </SectionFiche>
 
@@ -177,7 +177,7 @@ export default function PageProjet({ projet, onRetour }: Props) {
           </SectionFiche>
         )}
 
-                {projet.galerie && projet.galerie.length > 0 && (
+        {projet.galerie && projet.galerie.length > 0 && (
           <SectionFiche icone={BadgeCheck} titre="Captures d'écran des manipulations">
             <Galerie galerie={projet.galerie} titre={projet.titre} />
           </SectionFiche>

@@ -318,7 +318,7 @@ export const projets: FicheProjet[] = [
       "Outil hping3 pour la simulation de l'attaque SYN Flooding",
       'Matériel physique du département TIC (pas de machines virtuelles pour ce projet)',
     ],
-    schema: '/reseau-firewall-schema.svg',
+    schema: '/reseau-firewall-schema.png',
     schemaLegende:
       "Schéma simplifié de l'architecture mise en place par le groupe 2 : un réseau privé (192.168.2.0/24) séparé d'un réseau public (172.16.0.0/16) par un Firewall Linux, avec un service Web rendu accessible depuis l'extérieur par Port Forwarding — et la cible de l'attaque SYN Flooding menée depuis le réseau public.",
     etapes: [

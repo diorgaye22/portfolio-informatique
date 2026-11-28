@@ -43,7 +43,7 @@ export function MediaPlaceholder({
   );
 }
 
-export function MediaFigure({ chemin, typeMedia = 'image', alt }: MediaPlaceholderProps & { alt?: string }) {
+export function MediaFigure({ chemin, typeMedia = 'image', alt, contenirEntier = false }: MediaPlaceholderProps & { alt?: string; contenirEntier?: boolean }) {
   const [erreur, setErreur] = useState(false);
   useEffect(() => setErreur(false), [chemin]);
 
@@ -66,7 +66,11 @@ export function MediaFigure({ chemin, typeMedia = 'image', alt }: MediaPlacehold
         alt={alt ?? 'Capture du projet'}
         loading="lazy"
         onError={() => setErreur(true)}
-        className="aspect-video w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
+        className={
+          contenirEntier
+            ? 'w-full h-auto object-contain bg-night-950'
+            : 'aspect-video w-full object-cover transition-transform duration-300 hover:scale-[1.02]'
+        }
       />
     </figure>
   );
